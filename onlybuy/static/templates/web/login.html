@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>皮爷の箱包馆登陆页面</title>
+    <link rel="stylesheet" href="../css/index.css">
+    <link href="../css/animate.css" rel="Stylesheet" />
+    <link href="../css/login.css" rel="stylesheet" />
+    <link rel="icon" href="../images/index/py.ico">
+    <script src="../js/init.js"></script>
+</head>
+
+<body>
+    <!-- 页面顶部-->
+    <header id="top">
+        <div class="top">
+            <a href="index.html">
+                <img src="../images/header/logo.png" alt="" />
+            </a>
+            <span>欢迎登录</span>
+        </div>
+    </header>
+    <div id="container">
+        <div id="cover" class="rt">
+            <form id="login-form" method="post" name="form1">
+                <div class="txt">
+                    <p>登录
+                        <span>
+                            <a href="register.html">新用户注册</a>
+                        </span>
+                    </p>
+                    <div class="text">
+                        <input type="text" placeholder="请输入您的用户名" name="username" id="username" required>
+                        <span><img src="../images/login/user.png"></span>
+                    </div>
+
+                    <div class="text">
+                        <input type="password" id="password" placeholder="请输入您的密码" name="password" required minlength="6"
+                            maxlength="15">
+                        <span><img src="../images/login/password.png"></span>
+                    </div>
+                    <!-- 验证码 -->
+                    <div class="verification">
+                        <img src="/user/verifycode" alt="" class="verification_img">
+                        <input placeholder="请输入验证码" type="text" class="verification_input">
+                        <span class="verification_text"></span>
+                    </div>
+
+                    <div class="chose">
+                        <input type="checkbox" class="checkbox" id="ck_rmbUser" value="0">自动登录
+                        <span>忘记密码？</span>
+                    </div>
+                    <input class="button_login" type="button" value="登录" id="bt-login" onclick="Save()" />
+                </div>
+            </form>
+        </div>
+    </div>
+    <!--错误提示-->
+    <div id="showResult"></div>
+
+    <!-- 页面底部-->
+    <div class="foot_bj">
+        <div id="foot">
+            <div class="lf">
+                <p class="footer1"><img src="../images/footer/logo.png" alt="" class=" footLogo" /></p>
+                <p class="footer2"><img src="../images/footer/footerFont.png" alt="" /></p>
+
+            </div>
+            <div class="service">
+                <p>皮爷の商城客户端</p>
+                <img src="../images/footer/ios.png" class="lf">
+                <img src="../images/footer/android.png" alt="" class="lf" />
+            </div>
+            <div class="download">
+                <img src="../images/footer/erweima.png">
+            </div>
+            <!-- 页面底部-备案号 #footer -->
+            <div class="record">
+                &copy;2018 皮爷の集团有限公司 版权所有 京ICP证xxxxxxxxxxx
+            </div>
+        </div>
+    </div>
+    <script src="../js/jquery-3.1.1.min.js"></script>
+    <script src="../../jquery/jquery.cookie.js"></script>
+    <script>
+        $("#username").blur(function () {
+            var data = $("#username").val();
+            if (data == null || data == "") {
+                $("#showResult").text("用户名不能为空！").css("color", "red");
+                return false;
+            }
+            $.ajax({
+                type: "get",
+                url: "/user/checkusername",
+                data: "username=" + data,
+                beforeSend: function (XMLHttpRequest) {
+                    $("#showResult").text("正在查询");
+
+                },
+                success: function (msg) {
+                    if (!JSON.parse(msg).result) {
+                        $("#showResult").text("该用户名可以被使用").css("color", "#fff");
+                    } else if (JSON.parse(msg).result) {
+                        $("#showResult").text("该用户名不存在").css("color", "red");
+                    } else {
+                        $("#showResult").text("系统异常！").css("color", "red");
+                    }
+                },
+                error: function () {
+                    //错误处理
+                }
+            });
+        });
+    </script>
+    <script>
+
+    </script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            if ($.cookie("rmbUser") == "true") {
+                $("#ck_rmbUser").attr("checked", true);
+                $("#username").val($.cookie("username"));
+                $("#password").val($.cookie("password"));
+            }
+        });
+
+        //记住用户名密码
+        function Save() {
+            if ($("#ck_rmbUser").attr("checked")) {
+                var str_username = $("#username").val();
+                console.log(str_username);
+                var str_password = $("#password").val();
+                $.cookie("rmbUser", "true", {
+                    expires: 7
+                }); //存储一个带7天期限的cookie
+                $.cookie("username", str_username, {
+                    expires: 7
+                });
+                $.cookie("password", str_password, {
+                    expires: 7
+                });
+            } else {
+                $.cookie("rmbUser", "false", {
+                    expire: -1
+                });
+                $.cookie("username", "", {
+                    expires: -1
+                });
+                $.cookie("password", "", {
+                    expires: -1
+                });
+            }
+        };
+    </script>
+    <script>
+        $(".verification_img").click(() => {
+            var code = parseInt(Math.random() * 10000);
+            var src = "/user/verifycode?id=" + code;
+            $(".verification_img").attr("src", src);
+        })
+        $(".verification_input").blur(() => {
+            var verification = $(".verification_input").val();
+        })
+        $('#bt-login').click(function () {
+            //读取用户的输入——表单序列化
+            var inputData = $('#login-form').serialize();
+            //异步提交请求，进行验证
+            // console.log(inputData)
+            var verification = $(".verification_input").val();
+            var username = $("#username").val();
+            var password = $("#password").val();
+            if (verification == '') {
+                $(".verification_text").html("验证码不能为空!")
+            } else {
+                $.ajax({
+                    type: 'post',
+                    url: '/user/verifycodeValid',
+                    data: {
+                        "vc": verification
+                    },
+                    success: function (response) {
+                        $(".verification_text").html("")
+                    },
+                    error: function (err) {
+
+                    }
+                })
+            }
+            if (verification != '' && username != '' && password != '') {
+                $.ajax({
+                    type: 'POST',
+                    url: '/user/login',
+                    data: inputData+'&vc='+verification,
+                    success: function (response) {
+                        var result = JSON.parse(response)
+                        console.log(result)
+                        if (result.result) { //登录成功
+                            sessionStorage['loginName'] = result.data;
+                            console.log(result.data);
+                            alert('登录成功')
+                            window.location.href = 'index.html';
+                        } else { //登录失败
+                            $('#showResult').html('登录失败！错误消息为：' + result.error);
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
