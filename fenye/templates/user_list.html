@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>自定义分页</title>
+</head>
+<body>
+    <table>
+        {% for line in result %}
+            <tr>
+                <td style="color: #2b85e4">{{ line.username }}</td>
+                <td>{{ line.age }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    <hr>
+    <div>
+        {{ pager_str }}
+    </div>
+</body>
+</html>

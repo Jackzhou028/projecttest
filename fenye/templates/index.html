@@ -1,0 +1,46 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>分页</title>
+</head>
+<body>
+{% for good in page.object_list%}
+    <h4>{{ good.name }}---{{ good.des }}</h4>
+{% endfor %}
+
+<ul>
+{#    如果当前页还有上一页#}
+    {% if page.has_previous %}
+        <li>
+{#        点击a标签，跳转到上一页?index为地址后面拼接的参数#}
+            <a href="?index={{ page.previous_page_number }}">上一页</a>
+        </li>
+    {% else %}
+{#        如果没有上一页，则上一页按钮不可点击#}
+        <li>
+            <a href="#">上一页</a>
+        </li>
+    {% endif %}
+
+    {% for page_number in paginator.page_range %}
+{#        获取当前页的页码#}
+        <li>
+            <a href="?index={{ page_number }}">{{ page_number }}</a>
+        </li>
+    {% endfor %}
+
+    {% if page.has_next %}
+        <li>
+            <a href="?index={{ page.next_page_number }}">下一页</a>
+        </li>
+    {% else %}
+        <li>
+            <a href="#">下一页</a>
+        </li>
+    {% endif %}
+
+</ul>
+</body>
+</html>

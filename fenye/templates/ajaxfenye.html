@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>ajax实现分页</title>
+</head>
+<script type="text/javascript" src="{% static "js/jquery-1.12.4.min.js" %}"></script>
+<body>
+<!--style样式可以忽略，对整个功能方面没影响-->
+<input type="text" class="form-control" name="content" id="content" placeholder="Search for..." style="width: 400px;height:40px;right: 130px;top: 15px;background: #000000;color: #eeeeee;border-radius: 6px">
+
+<button class="btn btn-default" id="search" type="button" style="top: 30px;right: 180px;border-radius: 6px">搜索</button>
+
+<!--放置数据-->
+<div id="search_content"></div>
+<!--放置上一页，下一页按钮-->
+<nav class="navbar navbar-default navbar-fixed-bottom" id="nav_btn" style="left:700px;right: 580px;background: #ffffff;margin: 0;padding: 0"></nav>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+       <!--搜索按钮点击事件-->
+       $('#search').click(function(){
+            $.ajax({
+                type:"get",
+                url:"http://127.0.0.1:8000/custom/ajx",
+                data:{"content":$("#content").val(),"page":0},
+                success:function(results){
+                    render(results)
+                }
+            });
+       });
+    });
+</script>
